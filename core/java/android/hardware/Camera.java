@@ -312,8 +312,24 @@ public class Camera {
      *   cameras or an error was encountered enumerating them.
      */
     public static int getNumberOfCameras() {
+        boolean exposeAuxCamera = false;
+        String packageName = ActivityThread.currentOpPackageName();
+        /* Force to expose only two cameras
+         * if the package name does not falls in this bucket
+         */
+        String packageList = SystemProperties.get("vendor.camera.aux.packagelist");
+        if (packageList.length() > 0) {
+            TextUtils.StringSplitter splitter = new TextUtils.SimpleStringSplitter(',');
+            splitter.setString(packageList);
+            for (String str : splitter) {
+                if (packageName.equals(str)) {
+                    exposeAuxCamera = true;
+                    break;
+                }
+            }
+        }
         int numberOfCameras = _getNumberOfCameras();
-        if (!shouldExposeAuxCamera() && numberOfCameras > 2) {
+        if (exposeAuxCamera == false && (numberOfCameras > 2)) {
             numberOfCameras = 2;
         }
         return numberOfCameras;
@@ -335,7 +351,7 @@ public class Camera {
      *    low-level failure).
      */
     public static void getCameraInfo(int cameraId, CameraInfo cameraInfo) {
-        if (cameraId >= getNumberOfCameras()) {
+        if(cameraId >= getNumberOfCameras()){
             throw new RuntimeException("Unknown camera ID");
         }
         _getCameraInfo(cameraId, cameraInfo);
@@ -610,8 +626,8 @@ public class Camera {
 
     /** used by Camera#open, Camera#open(int) */
     Camera(int cameraId) {
-        if (cameraId >= getNumberOfCameras()) {
-            throw new RuntimeException("Unknown camera ID");
+        if(cameraId >= getNumberOfCameras()){
+             throw new RuntimeException("Unknown camera ID");
         }
         int err = cameraInitNormal(cameraId);
         if (checkInitErrors(err)) {
