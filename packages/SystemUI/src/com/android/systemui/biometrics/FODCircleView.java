@@ -26,7 +26,6 @@ import android.graphics.Paint;
 import android.graphics.PixelFormat;
 import android.graphics.Point;
 import android.graphics.drawable.AnimationDrawable;
-import android.hardware.biometrics.BiometricSourceType;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.RemoteException;
@@ -224,11 +223,9 @@ public class FODCircleView extends ImageView {
 
         mLockPatternUtils = new LockPatternUtils(mContext);
 
-        mFODAnimation = new FODAnimation(context, mPositionX, mPositionY);
-    }
-
         mUpdateMonitor = KeyguardUpdateMonitor.getInstance(context);
         mUpdateMonitor.registerCallback(mMonitorCallback);
+        mFODAnimation = new FODAnimation(context, mPositionX, mPositionY);
     }
 
     @Override
